@@ -9,12 +9,14 @@ $pageResponse = response();
 
 function response() {
 
+    global $module;
+
     // 데이터베이스 설치 파라미터가 들어왔을 경우
     if (!isset($_POST["db-host"])) {
         return array("type" => "success");
     }
 
-    if (!isset($_POST["db-name"]) || !isset($_POST["db-id"]) || !isset($_POST["db-password"]) || !isset($_POST["dansang-password"])) {
+    if (!isset($_POST["db-name"]) || !isset($_POST["db-id"]) || !isset($_POST["db-password"]) || !isset($_POST["db-table-prefix"]) || !isset($_POST["dansang-password"])) {
         return array("type" => "error",
                      "message" => "파라미터가 충분하지 않습니다.");
     }
@@ -27,7 +29,11 @@ function response() {
                      "message" => "데이터베이스 접속에 실패했습니다.");
     }
 
+    // prefix 유효성 체크
+
     // 테이블 생성
+
+    // password 값 추가 (해시해서)
     
 
     // 설정 파일 쓰기
@@ -36,6 +42,7 @@ function response() {
     $config .= "const USER_NAME = \"" .$_POST["db-id"]. "\"\n";
     $config .= "const USER_PASSWORD = \"" .$_POST["db-password"]. "\"\n";
     $config .= "const DB_NAME = \"" .$_POST["db-name"]. "\"\n";
+    $config .= "const TABLE_PREFIX = \"" .$_POST["db-table-prefix"]. "\"\n";
     $config .= "?>";
 
     file_put_contents("./module.db.account.php", $config);
@@ -59,11 +66,17 @@ include "frame.header.php";
     ?>
     <hr>
     <form method="post">
-        <label for="dbHostInput">데이터베이스 호스트</label>
-        <input class="u-full-width" type="text" placeholder="localhost" id="dbHostInput" name="db-host" <?php $module->utils->defaultPostValue("db-host");?> required>
-        <label for="dbNameInput">데이터베이스 이름</label>
-        <input class="u-full-width" type="text" id="dbNameInput" name="db-name" <?php $module->utils->defaultPostValue("db-name");?> required>
         <div class="row">
+            <div class="one-half column">
+                <label for="dbHostInput">데이터베이스 호스트</label>
+                <input class="u-full-width" type="text" placeholder="localhost" id="dbHostInput" name="db-host" <?php $module->utils->defaultPostValue("db-host");?> required>
+            </div>
+            <div class="one-half column">
+                <label for="dbNameInput">데이터베이스 이름</label>
+                <input class="u-full-width" type="text" id="dbNameInput" name="db-name" <?php $module->utils->defaultPostValue("db-name");?> required>
+            </div>
+        </div>
+       <div class="row">
             <div class="one-half column">
                 <label for="dbIdInput">데이터베이스 아이디</label>
                 <input class="u-full-width" type="text"  id="dbIdInput" name="db-id" <?php $module->utils->defaultPostValue("db-id");?> required>
@@ -73,6 +86,8 @@ include "frame.header.php";
                 <input class="u-full-width" type="text" id="dbPasswordInput" name="db-password" <?php $module->utils->defaultPostValue("db-password");?> required>
             </div>
         </div>
+        <label for="dbTablePrefixInput">테이블 이름 접두사</label>
+        <input class="u-full-width" type="text" id="dbTablePrefixInput" name="db-table-prefix" <?php $module->utils->defaultPostValue("db-table-prefix");?> required>
         <label for="dansangPasswordInput">단상 비밀번호</label>
         <input class="u-full-width" type="text" id="dansangPasswordInput" name="dansang-password" <?php $module->utils->defaultPostValue("dansang-password");?> required>
         <input class="button" style="margin-top: 30px" type="submit" value="설치하기">

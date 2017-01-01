@@ -115,7 +115,7 @@ $module->{"db"} = new class {
     }
 
     public function in($table) {
-        $this->queryBlocks["table"] = $table;
+        $this->queryBlocks["table"] = TABLE_PREFIX . $table;
         return $this;
     }
 
