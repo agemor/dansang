@@ -1,36 +1,70 @@
 <?php
 include "module.utils.php";
+include "module.db.php";
 
 $pageTitle = "나의 오늘";
 $pageAuthor = "김현준";
+$pageResponse = response();
+
+function response() {
+    global $module;
+
+    // 데이터베이스 유효성 체크
+    if (!file_exists("./module.db.account.php")) {
+        header("Location: ./");
+        return array("type" => "error",
+                     "message" => "데이터베이스 설정 파일이 존재하지 않습니다.");
+    }
+
+    $result = $module->db->in("dansang_articles")
+                         ->select("content")
+                         ->select("timestamp")
+                         ->orderBy("`no` DESC")
+                         ->goAndGetAll();
+
+    return array("type" => "success",
+                 "articles" => $result);
+}
 
 include "frame.header.php";
 ?>
 
 <div class="container" style="margin-top: 10%">
+<?php
 
-<h4>2016. 12. 23</h4>
-<p> 오전에 송도에 도착하니 대전에서 출발한 혁이가 송도에 도착할 즈음이 되어 있었다. 오랜만에 본 혁이가 정말 반가웠다. 함께 캠퍼스타운역 근처에서 감자탕을 먹었다. 배를 채운 후, 주전부리를 잔뜩 사들고 기숙사에 돌아오다.
-오후엔 밤샘의 영향인지 길게 낮잠을 잤다. 낮잠에서 일어나 저녁은 혁이, 종호, 도환이와 함께 치킨을 시켜먹었다.
-</p>
+const WEEK_DAYS = array("일", "월", "화", "수", "목", "금", "토");
 
-<hr/>
 
-<h4>2016. 12. 22</h4>
-<p> 오늘도 역시 아침잠에 지고 말았다. 시간에 쫓기며 YSCON 정기 회의에 참여하기 위해 신촌으로 향했다. 비오는 신촌 거리, 난 우산이 없었고 다 젖었다. 새로운 YSCON 멤버 두 명 그리고 준혁이와 함께 닭갈비를 먹었다.
-친숙함과 새로움이 공존하는 회의 분위기 속에서 우리는 조금은 서둘러 행사 계획을 세웠다. 준혁이에게 여러모로 고마웠다. 회의가 끝난 후, 신촌 현대백화점에서 나윤이와 친구들을 위한 크리스마스 카드와 방에 장식할 가랜드를 샀다. 그러고도 시간이 남기에
-인근 카페에 자리잡고 노트북을 펼쳤다. 저녁은 광화문 교보문고에서 수연이와 먹었다. 긴 시간은 아니었지만 꽤 여운이 남는 대화를 나누며 앞으로의 협업을 다짐했다. 수연이와 헤어진 후, 신촌역 인근의 세영이 오피스텔로 향했다. 함께 KSCY 홈페이지 관련하여 밤샘 작업을 했다.
-세영이의 조용한 카리스마를 다시 한 번 느낄 수 있었다. 쌀쌀한 다음 날 아침 지하철을 타고 송도로 돌아오다.
-</p>
+// 암호화된 부분을 HTML 요소로 가공하는 함수
+function parseContent($content) {
+    $chunks = explode("*", $content);
+    for ($i = 1; $i < count($chunks); $i += 2) {
+        $chunk = $chunks[$i];
+        $data = explode("|", $chunk);
+        $placeholder = "";
+        $placeholderLength = intval($data[0]);
+        for ($j = 0; $j < $placeholderLength; $j++) {
+            $placeholder .= "*";
+        }
+        $chunks[$i] = "<code value=\"".$data[1]."\">" . $placeholder . "</code>";
+    }
+    return implode("", $chunks);
+}
 
-<hr/>
 
-<h4>2016. 12. 21</h4>
-<p> 아침 늦게 기상. 삼성동 COEX에서 재훈이형을 만나 중식을 든든히 먹은 후, 인근 ASEM 타워에서 <code>***</code>님과 설리번 프로젝트에 관한 미팅을 가졌다.
-프로젝트의 향후 진행에 대한 의견과 후원 가능성을 말씀해 주셨으나, 이 기회에 대한 준비가 되지 않았다는 사실은 이미 나 스스로가 잘 아는 터. 비오는 삼성동의 우울한 풍광에 젖었다.
-축 젖은 채 송도에 돌아와서 <단상>을 만들다.
-</p>
-
+for ($i = 0; $i < count($pageResponse["articles"]); $i++) {
+    $article = $pageResponse["articles"][$i];
+    $time = strtotime($article["timestamp"]);
+    $id = "date-".date("Ymd", $time);
+    echo "<div id=\"". $id ."\">\n";
+    echo "<h4><a href=\"#".$id."\">" .date("Y. m. d.", $time) . " " . WEEK_DAYS[date("w", $time)] . "</a></h4>\n";
+    echo "<p>" . parseContent($article["content"]) . "</p>\n";
+    echo "</div>\n";
+    if ($i < count($pageResponse["articles"]) - 1) {
+        echo "<hr/>\n";
+    }
+}
+?>
 </div>
 
 <?php
