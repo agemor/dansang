@@ -1,5 +1,6 @@
 <?php
 include "module.utils.php";
+include "module.crypto.php";
 
 error_reporting(E_ERROR | E_PARSE);
 
@@ -30,28 +31,50 @@ function response() {
     }
 
     // prefix 유효성 체크
+    $tablePrefix = preg_replace('/\s+/', '', $_POST["db-table-prefix"]);
 
     // 테이블 생성
 
+    if (!file_exists("./sql/articles.sql") || !file_exists("./sql/settings.sql")) {
+        return array("type" => "error",
+                     "message" => "데이터베이스 테이블 생성 쿼리가 존재하지 않습니다.");
+    }
+
+    $articlesSql = str_replace("@", $tablePrefix, file_get_contents("./sql/articles.sql")); 
+    $settingsSql = str_replace("@", $tablePrefix, file_get_contents("./sql/settings.sql")); 
+
+    $articlesSqlResult = $db->query($articlesSql);
+    $settingsSqlResult = $db->query($settingsSql);
+
+    if (!$articlesSqlResult || !$settingsSqlResult) {
+        return array("type" => "error",
+                     "message" => "데이터베이스 테이블 생성에 실패하였습니다.");
+    }
+
     // password 값 추가 (해시해서)
-    
+    $passwordSql = "INSERT INTO `".$tablePrefix."dansang_settings` (`key`, `value`) VALUES ('password', '".$module->crypto->hash($_POST["dansang-password"])."');";
+    $passwordSqlResult = $db->query($passwordSql);
+
+    if (!$passwordSqlResult) {
+        return array("type" => "error",
+                     "message" => "데이터베이스 테이블 설정에 실패하였습니다.");
+    }
 
     // 설정 파일 쓰기
     $config = "<?php\n";
-    $config .= "const SERVER_NAME = \"" .$_POST["db-host"]. "\"\n";
-    $config .= "const USER_NAME = \"" .$_POST["db-id"]. "\"\n";
-    $config .= "const USER_PASSWORD = \"" .$_POST["db-password"]. "\"\n";
-    $config .= "const DB_NAME = \"" .$_POST["db-name"]. "\"\n";
-    $config .= "const TABLE_PREFIX = \"" .$_POST["db-table-prefix"]. "\"\n";
+    $config .= "const SERVER_NAME = \"" .$_POST["db-host"]. "\";\n";
+    $config .= "const USER_NAME = \"" .$_POST["db-id"]. "\";\n";
+    $config .= "const USER_PASSWORD = \"" .$_POST["db-password"]. "\";\n";
+    $config .= "const DB_NAME = \"" .$_POST["db-name"]. "\";\n";
+    $config .= "const TABLE_PREFIX = \"" .$tablePrefix. "\";\n";
     $config .= "?>";
 
     file_put_contents("./module.db.account.php", $config);
 
+    header("Location: ./");
 
     return array("type" => "success");
 }
-
-var_dump($pageResponse);
 
 include "frame.header.php";
 ?>
