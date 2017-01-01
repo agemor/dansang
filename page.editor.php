@@ -3,7 +3,7 @@ include "module.utils.php";
 include "module.db.php";
 include "module.crypto.php";
 
-//error_reporting(E_ERROR | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 $pageTitle = "나의 오늘";
 $pageAuthor = "김현준";
@@ -12,6 +12,22 @@ $pageResponse = response();
 function response() {
 
     global $module;
+
+    // 데이터베이스 유효성 체크
+    if (!file_exists("./module.db.account.php")) {
+        return array("type" => "error",
+                     "message" => "데이터베이스 설정 파일이 존재하지 않습니다.");
+    }
+
+    // 시간대 가져오기
+    $result = $module->db->in("dansang_settings")
+                         ->select("value")
+                         ->where("key", "=", "timezone")
+                         ->goAndGet();
+
+    if ($result) {
+       date_default_timezone_set($result["value"]);
+    }
 
     // 입력 파라미터가 들어왔을 경우
     if (!isset($_POST["message"])) {
@@ -47,7 +63,7 @@ function response() {
                ->goAndGet();
 
     // 만약 오늘 이미 작성하였다면
-    if (!$result) {
+    if ($result) {
         if (date('Ymd') == date('Ymd', strtotime($result["timestamp"]))) {
             return array("type" => "error",
                      "message" => "하루에 한 번만 단상을 작성할 수 있습니다.");
@@ -55,9 +71,9 @@ function response() {
     }
 
     $message = $_POST["message"];
-
+    $messageLength = mb_strlen($message, "utf-8");
     // 메시지 길이 체크
-    if (mb_strlen($message) > 2048) {
+    if ($messageLength > 2048) {
         return array("type" => "error",
                      "message" => "단상이 너무 깁니다. 2000자 내외로 작성해 주세요.");
     }
@@ -65,21 +81,20 @@ function response() {
     $secretMode = false;
     $secretBuffer = "";
 
-    // 암호화
-    for ($i = 0; $i < mb_strlen($message); $i++) {
-        $char = mb_substr($message, $i, 1);
-
+    // 메시지 암호화
+    for ($i = 0; $i < $messageLength; $i++) {
+        $char = mb_substr($message, $i, 1, "utf-8");
         if (strcmp($char, "*") == 0) {
-
             if (!$secretMode) {
                 $secretMode = true;
             } else {
                 $secretMode = false;
-                $encrypted .= $module->crypto->encrypt($secretBuffer, $_POST["key"]);
+                $encrypted .= mb_strlen($secretBuffer, "utf-8") . "|" . $module->crypto->encrypt($secretBuffer, $_POST["key"]);
                 $secretBuffer = "";
             }
+            $encrypted .= $char;
+            continue;
         }
-
         if ($secretMode) {
             $secretBuffer .= $char;
         } else {
@@ -90,7 +105,9 @@ function response() {
     // 단상 업로드
     $result = $module->db->in("dansang_articles")
                ->insert("content", $encrypted)
+               ->insert("timestamp", date("Y-m-d H:i:s"))
                ->go();
+
     if (!$result) {
          return array("type" => "error",
                      "message" => "단상을 업데이트하지 못했습니다.");
@@ -118,7 +135,7 @@ if ($pageResponse["type"] == "success") {
 <hr>
 <form method="post">
   <label for="messageInput">삶의 기록</label>
-  <textarea class="u-full-width" id="messageInput" name="message" <?php $module->utils->defaultPostValue("message");?> required></textarea>
+  <textarea class="u-full-width" id="messageInput" name="message" required><?php echo(isset($_POST["message"]) ? $_POST["message"] : "");?></textarea>
   <div class="row">
     <div class="six columns">
       <label for="passwordInput">글쓴이 암호</label>
