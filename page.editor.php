@@ -124,7 +124,7 @@ include "frame.header.php";
 
 <div class="container" style="margin-top: 10%">
 
-<h4><?php echo(date("n")."월 ".date("j")."일");?>의 단상</h4>
+<h4><a href="#"><?php echo(date("n")."월 ".date("j")."일");?>의 단상</a></h4>
 <?php
 if ($pageResponse["type"] == "success") {
     echo("<p>오늘, 당신의 하루는 어땠나요?</p>");
@@ -135,7 +135,7 @@ if ($pageResponse["type"] == "success") {
 <hr>
 <form method="post">
   <label for="messageInput">삶의 기록</label>
-  <textarea class="u-full-width" id="messageInput" name="message" required><?php echo(isset($_POST["message"]) ? $_POST["message"] : "");?></textarea>
+  <textarea class="u-full-width" id="messageInput" name="message" placeholder="'*'로 감싼 부분은 암호화됩니다." required><?php echo(isset($_POST["message"]) ? $_POST["message"] : "");?></textarea>
   <div class="row">
     <div class="six columns">
       <label for="passwordInput">글쓴이 암호</label>
@@ -146,7 +146,7 @@ if ($pageResponse["type"] == "success") {
       <input class="u-full-width" type="text" id="keyInput" name="key" required>
     </div>
   </div>
-  <input class="button"  style="margin-top: 30px" type="submit" value="저장하기">
+  <input class="button-primary"  style="margin-top: 30px" type="submit" value="저장하기">
 </form>
 </div>
 

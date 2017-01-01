@@ -83,7 +83,7 @@ function response() {
 include "frame.header.php";
 ?>
 <div class="container" style="margin-top: 10%">
-    <h4>단상 · 斷想<br/>설치를 시작합니다.</h4>
+    <h4><a href="#">단상 · 斷想<br/>설치를 시작합니다.</a></h4>
     <?php
     if ($pageResponse["type"] == "success") {
         echo("<p>당신의 삶이 기록되는데 필요한 정보를 알려주세요.</p>");
@@ -115,7 +115,7 @@ include "frame.header.php";
         </div>
         <label for="dbTablePrefixInput">테이블 이름 접두사</label>
         <input class="u-full-width" type="text" id="dbTablePrefixInput" name="db-table-prefix" <?php $module->utils->defaultPostValue("db-table-prefix");?> required>
-        <label for="dbTimezoneInput">시간대</label>
+        <label for="dbTimezoneInput">당신이 위치한 지역</label>
         <select class="u-full-width" id="dbTimezoneInput" name="db-timezone">
             <option value="Pacific/Midway">(GMT-11:00) Midway Island, Samoa</option>
             <option value="America/Adak">(GMT-10:00) Hawaii-Aleutian</option>
@@ -208,9 +208,9 @@ include "frame.header.php";
             <option value="Pacific/Tongatapu">(GMT+13:00) Nuku'alofa</option>
             <option value="Pacific/Kiritimati">(GMT+14:00) Kiritimati</option>
         </select>
-        <label for="dansangPasswordInput">단상 비밀번호</label>
+        <label for="dansangPasswordInput">글쓴이 암호</label>
         <input class="u-full-width" type="text" id="dansangPasswordInput" name="dansang-password" <?php $module->utils->defaultPostValue("dansang-password");?> required>
-        <input class="button" style="margin-top: 30px" type="submit" value="설치하기">
+        <input class="button-primary" style="margin-top: 30px" type="submit" value="설치하기">
     </form>
 </div>
 <?php

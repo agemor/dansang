@@ -29,11 +29,11 @@ function response() {
 include "frame.header.php";
 ?>
 
-<div class="container" style="margin-top: 10%">
+<div class="container" style="margin-top: 10%; margin-bottom: 10%">
+<a class="u-pull-right" href="./page.editor.php">단상 남기기</a>
 <?php
 
 const WEEK_DAYS = array("일", "월", "화", "수", "목", "금", "토");
-
 
 // 암호화된 부분을 HTML 요소로 가공하는 함수
 function parseContent($content) {
@@ -51,22 +51,26 @@ function parseContent($content) {
     return implode("", $chunks);
 }
 
-
+// 페이지 랜더링
 for ($i = 0; $i < count($pageResponse["articles"]); $i++) {
     $article = $pageResponse["articles"][$i];
     $time = strtotime($article["timestamp"]);
     $id = "date-".date("Ymd", $time);
-    echo "<div id=\"". $id ."\">\n";
-    echo "<h4><a href=\"#".$id."\">" .date("Y. m. d.", $time) . " " . WEEK_DAYS[date("w", $time)] . "</a></h4>\n";
-    echo "<p>" . parseContent($article["content"]) . "</p>\n";
-    echo "</div>\n";
+    echo "    <div id=\"". $id ."\">\n";
+    echo "        <h4><a href=\"#".$id."\">" .date("Y. m. d.", $time) . " " . WEEK_DAYS[date("w", $time)] . "</a></h4>\n";
+    echo "        <p>" . parseContent($article["content"]) . "</p>\n";
+    echo "    </div>\n";
     if ($i < count($pageResponse["articles"]) - 1) {
-        echo "<hr/>\n";
+        echo "    <hr/>\n";
     }
+}
+
+// 단상이 없는 경우
+if (count($pageResponse["articles"]) == 0) {
+    echo "<em>아직 작성된 단상이 없습니다.</em>";
 }
 ?>
 </div>
-
 <?php
 include "frame.footer.php";
 ?>
