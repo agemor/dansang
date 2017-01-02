@@ -73,7 +73,12 @@ function response() {
     $config .= "const TABLE_PREFIX = \"" .$tablePrefix. "\";\n";
     $config .= "?>";
 
-    file_put_contents("./module.db.account.php", $config);
+    $fileWriteResult = file_put_contents("./module.db.account.php", $config);
+
+    if (!$fileWriteResult) {
+        return array("type" => "error",
+                     "message" => "설정 파일 생성에 실패하였습니다. 폴더 권한을 확인해 주세요.");
+    }
 
     header("Location: ./");
 
