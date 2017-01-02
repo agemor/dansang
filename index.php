@@ -5,7 +5,23 @@
  * 설정 파일이 존재한다면, <단상>이 설치되어 있다는 의미이므로 글 목록 페이지를 로드합니다.
  */
 if (file_exists("./module.db.account.php")) {
-    include "./page.articles.php";
+
+    // 기본 페이지
+    if (!isset($_GET["page"])) {
+        include "./page.articles.php";
+    }
+
+    switch ($_GET["page"]) {
+        case "articles":
+            include "./page.articles.php";
+            break;
+        case "editor":
+            include "./page.editor.php";
+            break;
+        default:
+            include "./page.articles.php";
+            break;
+    }
 }
 
 /*

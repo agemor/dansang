@@ -133,7 +133,7 @@ if ($pageResponse["type"] == "success") {
 }
 ?>
 <hr>
-<form method="post">
+<form action="./?page=editor" method="post">
   <label for="messageInput">삶의 기록</label>
   <textarea class="u-full-width" id="messageInput" name="message" placeholder="'*'로 감싼 부분은 암호화됩니다." required><?php echo(isset($_POST["message"]) ? $_POST["message"] : "");?></textarea>
   <div class="row">

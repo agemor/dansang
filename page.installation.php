@@ -80,7 +80,7 @@ function response() {
                      "message" => "설정 파일 생성에 실패하였습니다. 폴더 권한을 확인해 주세요.");
     }
 
-    header("Location: ./");
+    header("Location: ./?page=articles");
 
     return array("type" => "success");
 }

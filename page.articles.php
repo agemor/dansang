@@ -30,7 +30,7 @@ include "frame.header.php";
 ?>
 
 <div class="container" style="margin-top: 10%; margin-bottom: 10%">
-<a class="u-pull-right" href="./page.editor.php">단상 남기기</a>
+<a class="u-pull-right" href="./?page=editor">단상 남기기</a>
 <?php
 
 const WEEK_DAYS = array("일", "월", "화", "수", "목", "금", "토");
@@ -57,7 +57,7 @@ for ($i = 0; $i < count($pageResponse["articles"]); $i++) {
     $time = strtotime($article["timestamp"]);
     $id = "date-".date("Ymd", $time);
     echo "    <div id=\"". $id ."\">\n";
-    echo "        <h4><a href=\"#".$id."\">" .date("Y. m. d.", $time) . " " . WEEK_DAYS[date("w", $time)] . "</a></h4>\n";
+    echo "        <h4><a href=\"./?page=articles#".$id."\">" .date("Y. m. d.", $time) . " " . WEEK_DAYS[date("w", $time)] . "</a></h4>\n";
     echo "        <p>" . parseContent($article["content"]) . "</p>\n";
     echo "    </div>\n";
     if ($i < count($pageResponse["articles"]) - 1) {
