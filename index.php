@@ -18,6 +18,9 @@ if (file_exists("./module.db.account.php")) {
         case "editor":
             include "./page.editor.php";
             break;
+        case "settings":
+            include "./page.settings.php";
+            break;
         default:
             include "./page.articles.php";
             break;

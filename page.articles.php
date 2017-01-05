@@ -9,13 +9,6 @@ $pageResponse = response();
 function response() {
     global $module;
 
-    // 데이터베이스 유효성 체크
-    if (!file_exists("./module.db.account.php")) {
-        header("Location: ./");
-        return array("type" => "error",
-                     "message" => "데이터베이스 설정 파일이 존재하지 않습니다.");
-    }
-
     $result = $module->db->in("dansang_articles")
                          ->select("content")
                          ->select("timestamp")
