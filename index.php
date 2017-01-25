@@ -9,6 +9,7 @@ if (file_exists("./module.db.account.php")) {
     // 기본 페이지
     if (!isset($_GET["page"])) {
         include "./page.articles.php";
+        return;
     }
 
     switch ($_GET["page"]) {
